@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "311395712372",
+    "project_id": "meechat-4ff49",
+    "storage_bucket": "meechat-4ff49.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:311395712372:android:162a746cf75f388db24021",
+        "android_client_info": {
+          "package_name": "com.example.meechat"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBe2JQt42FU7Fc8Sx5mETWHHUlVj3BZWVg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
