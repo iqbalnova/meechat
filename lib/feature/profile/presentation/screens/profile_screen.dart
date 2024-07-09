@@ -57,19 +57,24 @@ class _ProfileState extends State<Profile> {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        GetIt.instance<FirebaseService>().signOut();
-        Navigator.pushReplacementNamed(context, AppRoutes.login);
+        // GetIt.instance<FirebaseService>().signOut();
+        // Navigator.pushReplacementNamed(context, AppRoutes.login);
       },
       child: ListView(
         children: [
           _buildAvatar(),
           _buildCard(
-            title: formatFullName(
-              _userData?['firstName'],
-              _userData?['lastName'],
-            ),
-          ),
-          _buildCard(title: 'Logout', onTap: () {})
+              title: formatFullName(
+                _userData?['firstName'],
+                _userData?['lastName'],
+              ),
+              onTap: () {}),
+          _buildCard(
+              title: 'Logout',
+              onTap: () {
+                GetIt.instance<FirebaseService>().signOut();
+                Navigator.pushReplacementNamed(context, AppRoutes.login);
+              })
         ],
       ),
     );
