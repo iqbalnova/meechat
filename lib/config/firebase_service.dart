@@ -1,4 +1,3 @@
-// firebase_service.dart
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -15,9 +14,7 @@ class FirebaseService {
   static final FirebaseService _instance = FirebaseService._internal();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  factory FirebaseService() {
-    return _instance;
-  }
+  factory FirebaseService() => _instance;
 
   FirebaseService._internal();
 
@@ -28,20 +25,14 @@ class FirebaseService {
 
   // Register a new user
   Future<UserCredential> registerWithEmailPassword(
-      String email, String password, String firstName, String lastName) async {
+    String email,
+    String password,
+    String firstName,
+    String lastName,
+  ) async {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
-
-      // User? user = userCredential.user;
-      // if (user != null) {
-      //   await user.updateDisplayName(username);
-      //   // Jika Anda memiliki URL foto profil, Anda juga dapat menggunakannya:
-      //   // await user.updatePhotoURL(photoURL);
-
-      //   await user.reload(); // Refresh user object
-      //   user = FirebaseAuth.instance.currentUser; // Update the user variable
-      // }
 
       await FirebaseChatCore.instance.createUserInFirestore(
         types.User(
@@ -59,12 +50,13 @@ class FirebaseService {
 
   // Sign in with email and password
   Future<UserCredential> signInWithEmailPassword(
-      String email, String password) async {
+    String email,
+    String password,
+  ) async {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
 
-      // add user credential if doesn't already exist
       _firestore.collection('users').doc(userCredential.user!.uid).set({
         'uid': userCredential.user!.uid,
         'email': userCredential.user!.email,
@@ -77,24 +69,18 @@ class FirebaseService {
 
   // Sign out
   Future<void> signOut() async {
-    if (kDebugMode) {
-      print(FirebaseAuth.instance.signOut());
-    }
     await FirebaseAuth.instance.signOut();
   }
 
   // Get the current user
   User? getCurrentUser() {
-    if (kDebugMode) {
-      print(FirebaseAuth.instance.currentUser);
-    }
     return FirebaseAuth.instance.currentUser;
   }
 
+  // Delete account
   Future<void> deleteAccount() async {
     try {
       User? user = FirebaseAuth.instance.currentUser;
-
       if (user != null) {
         await user.delete();
         if (kDebugMode) {
@@ -112,10 +98,9 @@ class FirebaseService {
     }
   }
 
-// Messaging purpose
+  // Messaging purposes
   Future<void> saveTokenToDatabase(String token) async {
     String userId = FirebaseAuth.instance.currentUser!.uid;
-
     await FirebaseFirestore.instance.collection('users').doc(userId).update({
       'tokens': token,
     });
@@ -127,21 +112,25 @@ class FirebaseService {
     FirebaseMessaging.instance.onTokenRefresh.listen(saveTokenToDatabase);
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print("Foreground Message: $message");
+      if (kDebugMode) {
+        print("Foreground Message: ${message.data}");
+      }
     });
 
-    // Handle when the app is in the background
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      print("Background Message: $message");
+      if (kDebugMode) {
+        print("Background Message: ${message.data}");
+      }
     });
   }
 
-  Future<void> sendNotification(
-      {required String title,
-      required String body,
-      required String token}) async {
+  Future<void> sendNotification({
+    required String title,
+    required String body,
+    required String token,
+  }) async {
     const String serverKey =
-        'AAAASIChfXQ:APA91bFf1-x-Pqp-GdEDEt1QVIK5Q_64gpl2NLRSoiqK60hIzwk8xSZu_uCbLGTq-MvTKMJQi5clwKPFX-TZf9KQmcoNfP02r9lj8ECqLEj8I81jmkvQF9Jvp_89z4QoNQJF788OnE5H'; // Ganti dengan kunci server Firebase Anda
+        'AAAASIChfXQ:APA91bFf1-x-Pqp-GdEDEt1QVIK5Q_64gpl2NLRSoiqK60hIzwk8xSZu_uCbLGTq-MvTKMJQi5clwKPFX-TZf9KQmcoNfP02r9lj8ECqLEj8I81jmkvQF9Jvp_89z4QoNQJF788OnE5H';
     const String fcmEndpoint = 'https://fcm.googleapis.com/fcm/send';
 
     final Map<String, dynamic> notification = {
@@ -151,7 +140,7 @@ class FirebaseService {
 
     final Map<String, dynamic> data = {
       'notification': notification,
-      'to': token
+      'to': token,
     };
 
     final Dio dio = Dio();
