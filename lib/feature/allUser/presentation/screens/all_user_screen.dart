@@ -25,6 +25,8 @@ class _AllUserState extends State<AllUser> {
       arguments: {
         'room': room,
         'receiverName': receiverName,
+        'receiverUID': '',
+        'senderName': ''
       },
     );
   }
