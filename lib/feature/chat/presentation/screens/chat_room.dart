@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:flutter_chat_ui/flutter_chat_ui.dart';
 import 'package:flutter_firebase_chat_core/flutter_firebase_chat_core.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meechat/config/firebase_service.dart';
 import 'package:meechat/utils/styles.dart';
 
@@ -93,16 +94,27 @@ class _ChatRoomState extends State<ChatRoom> {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: Row(children: [
-            CircleAvatar(
-              backgroundColor: redColor,
-              child: const Text('R'),
-            ),
-            const SizedBox(
-              width: 14,
-            ),
-            Text(widget.receiverName)
-          ]),
+          foregroundColor: whiteColor,
+          title: Row(
+            children: [
+              CircleAvatar(
+                backgroundColor: Colors.transparent,
+                backgroundImage: NetworkImage(widget.room.imageUrl!),
+                radius: 20,
+              ),
+              const SizedBox(
+                width: 14,
+              ),
+              Text(
+                widget.receiverName,
+                style: whiteTextStyle.copyWith(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              )
+            ],
+          ),
+          backgroundColor: primaryColor,
         ),
         body: StreamBuilder<types.Room>(
           stream: FirebaseChatCore.instance.room(widget.room.id),
@@ -125,10 +137,12 @@ class _ChatRoomState extends State<ChatRoom> {
                 user: types.User(
                   id: FirebaseChatCore.instance.firebaseUser?.uid ?? '',
                 ),
-                theme: const DefaultChatTheme(
-                    inputBackgroundColor: Colors.purple,
+                theme: DefaultChatTheme(
+                    inputBackgroundColor: greyColor,
+                    primaryColor: primaryColor,
+                    secondaryColor: greyColor.withOpacity(0.1),
                     inputBorderRadius:
-                        BorderRadius.vertical(top: Radius.circular(0))),
+                        BorderRadius.vertical(top: Radius.circular(10.r))),
               ),
             );
           },
