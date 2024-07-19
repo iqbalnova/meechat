@@ -68,8 +68,9 @@ class RegisterForm extends StatelessWidget {
                 ],
               ),
               CustomButton(
-                onTap: isValidForm ? () => onRegister() : null,
+                onTap: onRegister,
                 label: 'Daftar',
+                isDisable: !isValidForm,
               ),
             ],
           ),
