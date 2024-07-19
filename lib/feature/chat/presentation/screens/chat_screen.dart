@@ -111,11 +111,28 @@ class _ChatState extends State<Chat> {
         }
 
         final firstMessage = snapshot.data!.first;
-        return Text(
-          firstMessage is types.TextMessage
-              ? firstMessage.text
-              : 'Media message',
-          overflow: TextOverflow.ellipsis,
+        final isCurrentUser = firstMessage.author.id == currentUserId;
+
+        return Row(
+          children: [
+            if (isCurrentUser)
+              const Padding(
+                padding: EdgeInsets.only(right: 8.0),
+                child: Icon(
+                  Icons.check,
+                  size: 16.0,
+                  color: Colors.blue,
+                ),
+              ),
+            Expanded(
+              child: Text(
+                firstMessage is types.TextMessage
+                    ? firstMessage.text
+                    : 'Media message',
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
         );
       },
     );
