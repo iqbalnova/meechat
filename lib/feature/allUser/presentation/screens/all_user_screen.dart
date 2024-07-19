@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_firebase_chat_core/flutter_firebase_chat_core.dart';
 import 'package:meechat/routes/app_routes.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
+import 'package:meechat/utils/styles.dart';
 import 'package:meechat/utils/util.dart';
 
 class AllUser extends StatefulWidget {
@@ -36,9 +37,9 @@ class _AllUserState extends State<AllUser> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text('Add More Friends!',
-            style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.blueGrey,
+        title: Text('Add More Friends!',
+            style: whiteTextStyle.merge(titleTextStyle)),
+        backgroundColor: primaryColor,
         centerTitle: false,
       ),
       body: StreamBuilder<List<types.User>>(

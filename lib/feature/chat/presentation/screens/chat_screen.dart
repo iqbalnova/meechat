@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_firebase_chat_core/flutter_firebase_chat_core.dart';
 import 'package:meechat/routes/app_routes.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
+import 'package:meechat/utils/styles.dart';
 import 'package:meechat/utils/util.dart';
 
 class Chat extends StatefulWidget {
@@ -57,8 +58,8 @@ class _ChatState extends State<Chat> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text('MeeChat', style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.blueGrey,
+        title: Text('Chat', style: whiteTextStyle.merge(titleTextStyle)),
+        backgroundColor: primaryColor,
         centerTitle: false,
       ),
       body: StreamBuilder<List<types.Room>>(
@@ -92,6 +93,7 @@ class _ChatState extends State<Chat> {
               return 0; // Jika keduanya null, tidak ada perubahan urutan
             }
           });
+
           return ListView.separated(
             itemCount: rooms.length,
             itemBuilder: (context, index) {
