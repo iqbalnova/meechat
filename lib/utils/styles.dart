@@ -12,7 +12,7 @@ FontWeight extraBold = FontWeight.w800;
 Color redColor = const Color(0XFFE75C62);
 Color blackColor = const Color(0xff000000);
 Color whiteColor = Colors.white;
-Color primaryColor = const Color(0xff7126B5);
+Color primaryColor = const Color(0xff36B8B8);
 
 Color greyColor = const Color(0XFF8A8A8A);
 

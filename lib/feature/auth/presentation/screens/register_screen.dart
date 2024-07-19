@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:meechat/config/firebase_service.dart';
 import 'package:meechat/feature/auth/presentation/widgets/register_widget.dart';
 import 'package:meechat/routes/app_routes.dart';
+import 'package:meechat/utils/styles.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -64,6 +65,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(e.toString()),
+          backgroundColor: redColor,
         ),
       );
     }
