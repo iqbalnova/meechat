@@ -58,12 +58,9 @@ class LoginForm extends StatelessWidget {
                   ],
                 ),
                 CustomButton(
-                  onTap: isValidForm
-                      ? () {
-                          onLogin();
-                        }
-                      : null,
+                  onTap: onLogin,
                   label: 'Masuk',
+                  isDisable: !isValidForm,
                 ),
               ],
             ),

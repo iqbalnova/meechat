@@ -44,7 +44,7 @@ class FirebaseService {
       );
       return userCredential;
     } on FirebaseAuthException catch (e) {
-      throw Exception(e.message);
+      throw (_getErrorMessageAuth(e.code));
     }
   }
 
@@ -63,7 +63,7 @@ class FirebaseService {
       }, SetOptions(merge: true));
       return userCredential;
     } on FirebaseAuthException catch (e) {
-      throw Exception(e.message);
+      throw (_getErrorMessageAuth(e.code));
     }
   }
 
@@ -163,6 +163,23 @@ class FirebaseService {
       if (kDebugMode) {
         print('Error: $error');
       }
+    }
+  }
+
+  String _getErrorMessageAuth(String errorCode) {
+    switch (errorCode) {
+      case 'invalid-email':
+        return 'The email address is badly formatted.';
+      case 'user-disabled':
+        return 'The user account has been disabled by an administrator.';
+      case 'user-not-found':
+        return 'No user found for that email.';
+      case 'wrong-password':
+        return 'Wrong password provided for that user.';
+      case 'invalid-credential':
+        return 'Wrong username or password for that user.';
+      default:
+        return 'An undefined Error happened.';
     }
   }
 }

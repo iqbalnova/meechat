@@ -7,6 +7,7 @@ class CustomButton extends StatelessWidget {
   final String label;
   final Decoration? decoration;
   final TextStyle? textStyle;
+  final bool isDisable;
 
   const CustomButton({
     super.key,
@@ -14,19 +15,20 @@ class CustomButton extends StatelessWidget {
     required this.label,
     this.decoration,
     this.textStyle,
+    this.isDisable = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onTap,
+      onTap: isDisable ? null : onTap,
       child: Ink(
         width: double.infinity,
         height: 48.h,
         decoration: decoration ??
             BoxDecoration(
               borderRadius: BorderRadius.circular(16),
-              color: primaryColor,
+              color: isDisable ? primaryColor.withOpacity(0.6) : primaryColor,
             ),
         child: Center(
             child: Text(
