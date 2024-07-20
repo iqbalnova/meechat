@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_firebase_chat_core/flutter_firebase_chat_core.dart';
 import 'package:intl/intl.dart';
 import 'package:meechat/routes/app_routes.dart';
@@ -116,12 +117,12 @@ class _ChatState extends State<Chat> {
         return Row(
           children: [
             if (isCurrentUser)
-              const Padding(
-                padding: EdgeInsets.only(right: 8.0),
+              Padding(
+                padding: const EdgeInsets.only(right: 8.0),
                 child: Icon(
                   Icons.check,
                   size: 16.0,
-                  color: Colors.blue,
+                  color: primaryColor,
                 ),
               ),
             Expanded(
