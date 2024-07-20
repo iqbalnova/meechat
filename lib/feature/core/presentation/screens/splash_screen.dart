@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meechat/config/firebase_service.dart';
 import 'package:meechat/routes/app_routes.dart';
@@ -17,12 +18,20 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
-    checkLoginStatus();
     super.initState();
+    _setStatusBarColor();
+    checkLoginStatus();
+  }
+
+  void _setStatusBarColor() {
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+      ),
+    );
   }
 
   Future<void> checkLoginStatus() async {
-    // Contoh: Gantilah logika ini dengan cara Anda memeriksa apakah pengguna sudah login
     final FirebaseService firebaseService = FirebaseService();
 
     Future.delayed(const Duration(seconds: 3), () {
