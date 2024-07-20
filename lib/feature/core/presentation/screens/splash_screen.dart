@@ -1,9 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meechat/config/firebase_service.dart';
 import 'package:meechat/routes/app_routes.dart';
+import 'package:meechat/utils/assets_manager.dart';
 import 'package:meechat/utils/styles.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -16,12 +18,20 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
-    checkLoginStatus();
     super.initState();
+    _setStatusBarColor();
+    checkLoginStatus();
+  }
+
+  void _setStatusBarColor() {
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+      ),
+    );
   }
 
   Future<void> checkLoginStatus() async {
-    // Contoh: Gantilah logika ini dengan cara Anda memeriksa apakah pengguna sudah login
     final FirebaseService firebaseService = FirebaseService();
 
     Future.delayed(const Duration(seconds: 3), () {
@@ -36,29 +46,25 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(''),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.storefront,
-              size: 100.sp,
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Container(
               color: primaryColor,
+              child: Image.asset(
+                AssetManager.splashImage,
+                fit: BoxFit.cover,
+              ),
             ),
-            Text(
-              'Welcome to MeeChat',
-              style: TextStyle(
-                  fontSize: 18.sp,
-                  color: primaryColor,
-                  fontWeight: FontWeight.w500),
-              textAlign: TextAlign.center,
-            )
-          ],
-        ),
+          ),
+          Center(
+            child: Image.asset(
+              AssetManager.splashIcon,
+              width: 120.w,
+              height: 120.h,
+            ),
+          ),
+        ],
       ),
     );
   }

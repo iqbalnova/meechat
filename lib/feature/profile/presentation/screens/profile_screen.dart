@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get_it/get_it.dart';
 import 'package:meechat/config/firebase_service.dart';
 import 'package:meechat/routes/app_routes.dart';
+import 'package:meechat/utils/styles.dart';
 
 class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
@@ -53,55 +54,93 @@ class _ProfileState extends State<Profile> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {
-        // GetIt.instance<FirebaseService>().signOut();
-        // Navigator.pushReplacementNamed(context, AppRoutes.login);
-      },
-      child: ListView(
+  Widget _buildAvatar() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          color: const Color(0XFFB5E2E2).withOpacity(0.4),
+          border: Border.all(color: const Color(0XFFB5E2E2))),
+      child: Row(
         children: [
-          _buildAvatar(),
-          _buildCard(
-              title: formatFullName(
-                _userData?['firstName'],
-                _userData?['lastName'],
+          CircleAvatar(
+            radius: 34.r,
+            backgroundImage: _userData?['imageUrl'] != null
+                ? NetworkImage(_userData?['imageUrl'])
+                : null,
+          ),
+          SizedBox(
+            width: 16.w,
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                formatFullName(
+                  _userData?['firstName'],
+                  _userData?['lastName'],
+                ),
+                style: blackTextStyle.merge(semiBoldStyle),
               ),
-              onTap: () {}),
-          _buildCard(
-              title: 'Logout',
-              onTap: () {
-                GetIt.instance<FirebaseService>().signOut();
-                Navigator.pushReplacementNamed(context, AppRoutes.login);
-              })
+              Text(_userData?['email'] ?? ''),
+            ],
+          )
         ],
       ),
     );
   }
 
-  Widget _buildAvatar() {
-    return Column(
-      children: [
-        CircleAvatar(
-          radius: 60.r,
-          backgroundImage: _userData?['imageUrl'] != null
-              ? NetworkImage(_userData?['imageUrl'])
-              : null,
+  Widget _buildCard({
+    required String title,
+    VoidCallback? onTap,
+    required IconData leadingIcon,
+    Color? foregroundColor,
+  }) {
+    return Container(
+      margin: EdgeInsets.fromLTRB(14.w, 0, 14.w, 4.h),
+      child: Card(
+        child: InkWell(
+          onTap: onTap,
+          child: ListTile(
+            leading: Icon(
+              leadingIcon,
+              color: foregroundColor,
+            ), // Ganti dengan ikon yang diinginkan
+            title: Text(
+              title,
+              style: TextStyle(color: foregroundColor),
+            ),
+            trailing: Icon(
+              Icons.arrow_forward_ios,
+              color: foregroundColor,
+            ), // Ikon panah kanan
+          ),
         ),
-      ],
+      ),
     );
   }
 
-  Widget _buildCard({required String title, VoidCallback? onTap}) {
-    return Card(
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: EdgeInsets.all(14.0.r),
-          child: Text(title),
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      children: [
+        _buildAvatar(),
+        // _buildCard(
+        //   title: 'Edit Profile',
+        //   onTap: () {},
+        //   leadingIcon: Icons.edit_sharp,
+        // ),
+        _buildCard(
+          title: 'Logout',
+          onTap: () {
+            GetIt.instance<FirebaseService>().signOut();
+            Navigator.pushReplacementNamed(context, AppRoutes.login);
+          },
+          leadingIcon: Icons.logout,
+          foregroundColor: redColor,
         ),
-      ),
+      ],
     );
   }
 }
