@@ -30,122 +30,225 @@ class _ChatRoomState extends State<ChatRoom> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   String receiverToken = '';
 
-  Future<void> fetchDataReceiver(String receiverUID) async {
+  @override
+  void initState() {
+    super.initState();
+    _fetchReceiverToken();
+  }
+
+  Future<void> _fetchReceiverToken() async {
     try {
-      DocumentSnapshot snapshot =
-          await _firestore.collection('users').doc(receiverUID).get();
+      final DocumentSnapshot snapshot =
+          await _firestore.collection('users').doc(widget.receiverUID).get();
 
       if (snapshot.exists) {
-        // Dokumen ditemukan, Anda dapat mengakses datanya di sini
-        var userData = snapshot.data() as Map<String, dynamic>;
-        var token = userData['tokens'];
+        final userData = snapshot.data() as Map<String, dynamic>;
+        final token = userData['tokens'];
         setState(() {
           receiverToken = token;
         });
       } else {
-        // Dokumen tidak ditemukan
         if (kDebugMode) {
-          print('Dokumen tidak ditemukan untuk UID: $receiverUID');
+          print('Document not found for UID: ${widget.receiverUID}');
         }
       }
     } catch (e) {
-      // Tangani kesalahan jika terjadi
       if (kDebugMode) {
-        print('Error: $e');
+        print('Error fetching receiver token: $e');
       }
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    fetchDataReceiver(widget.receiverUID);
-  }
-
-  void _handleMessageTap(BuildContext _, types.Message message) async {
-    if (message is types.FileMessage) {
-      if (message.uri.startsWith('http')) {
-        try {
-          final updatedMessage = message.copyWith(isLoading: true);
-          FirebaseChatCore.instance.updateMessage(
-            updatedMessage,
-            widget.room.id,
-          );
-        } finally {
-          final updatedMessage = message.copyWith(isLoading: false);
-          FirebaseChatCore.instance.updateMessage(
-            updatedMessage,
-            widget.room.id,
-          );
-        }
-      }
-    }
+  void _handleMessageTap(BuildContext context, types.Message message) async {
+    // Implement logic if needed
   }
 
   void _sendMessage(types.PartialText message) {
-    FirebaseChatCore.instance.sendMessage(
-      message,
-      widget.room.id,
-    );
+    FirebaseChatCore.instance.sendMessage(message, widget.room.id);
     FirebaseService().sendNotification(
-        title: widget.senderName, token: receiverToken, body: message.text);
+      title: widget.senderName,
+      token: receiverToken,
+      body: message.text,
+    );
+  }
+
+  void _handleMessageLongPress(BuildContext context, types.Message message) {
+    if (message.author.id == FirebaseChatCore.instance.firebaseUser?.uid) {
+      _showMessageOptions(context, message);
+    }
+  }
+
+  void _showMessageOptions(BuildContext context, types.Message message) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            ListTile(
+              leading: const Icon(Icons.edit),
+              title: const Text('Edit'),
+              onTap: () {
+                Navigator.pop(context);
+                _editMessage(message);
+              },
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.delete,
+                color: redColor,
+              ),
+              title: Text(
+                'Delete',
+                style: TextStyle(color: redColor),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                _deleteMessage(message);
+              },
+            ),
+            SizedBox(
+              height: 32.h,
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _editMessage(types.Message message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        final controller =
+            TextEditingController(text: (message as types.TextMessage).text);
+        return AlertDialog(
+          title: Text(
+            'Edit Message',
+            style: blackTextStyle,
+          ),
+          content: TextField(
+            controller: controller,
+            autofocus: true,
+            maxLines: null,
+            decoration: const InputDecoration(hintText: 'Enter new message'),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                if (controller.text.isNotEmpty) {
+                  final updatedMessage =
+                      (message).copyWith(text: controller.text);
+                  FirebaseChatCore.instance
+                      .updateMessage(updatedMessage, widget.room.id);
+                  Navigator.pop(context);
+                }
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _deleteMessage(types.Message message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Delete Message',
+            style: blackTextStyle,
+          ),
+          content: const Text('Are you sure you want to delete this message?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                FirebaseChatCore.instance
+                    .deleteMessage(widget.room.id, message.id);
+                Navigator.pop(context);
+              },
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  AppBar _buildAppBar() {
+    return AppBar(
+      foregroundColor: whiteColor,
+      title: Row(
+        children: [
+          CircleAvatar(
+            backgroundColor: Colors.transparent,
+            backgroundImage: NetworkImage(widget.room.imageUrl!),
+            radius: 20,
+          ),
+          const SizedBox(width: 14),
+          Text(
+            widget.receiverName,
+            style: whiteTextStyle.copyWith(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+      backgroundColor: primaryColor,
+    );
+  }
+
+  Widget _buildChatStream(types.Room room) {
+    return StreamBuilder<List<types.Message>>(
+      initialData: const [],
+      stream: FirebaseChatCore.instance.messages(room),
+      builder: (context, snapshot) {
+        final messages = snapshot.data ?? [];
+        return Chat(
+          messages: messages,
+          onMessageTap: _handleMessageTap,
+          onSendPressed: _sendMessage,
+          onMessageLongPress:
+              _handleMessageLongPress, // Use the method directly
+          user: types.User(
+            id: FirebaseChatCore.instance.firebaseUser?.uid ?? '',
+          ),
+          theme: DefaultChatTheme(
+            inputBackgroundColor: greyColor,
+            primaryColor: primaryColor,
+            secondaryColor: greyColor.withOpacity(0.1),
+            inputBorderRadius:
+                BorderRadius.vertical(top: Radius.circular(10.r)),
+          ),
+        );
+      },
+    );
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          foregroundColor: whiteColor,
-          title: Row(
-            children: [
-              CircleAvatar(
-                backgroundColor: Colors.transparent,
-                backgroundImage: NetworkImage(widget.room.imageUrl!),
-                radius: 20,
-              ),
-              const SizedBox(
-                width: 14,
-              ),
-              Text(
-                widget.receiverName,
-                style: whiteTextStyle.copyWith(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
-              )
-            ],
-          ),
-          backgroundColor: primaryColor,
-        ),
-        body: StreamBuilder<types.Room>(
-          stream: FirebaseChatCore.instance.room(widget.room.id),
-          builder: (context, roomSnapshot) {
-            if (!roomSnapshot.hasData) {
-              // Handle loading state or return a loading widget
-              return const CircularProgressIndicator();
-            }
-
-            return StreamBuilder<List<types.Message>>(
-              initialData: const [],
-              stream: FirebaseChatCore.instance.messages(roomSnapshot.data!),
-              builder: (context, snapshot) => Chat(
-                messages: snapshot.data ?? [],
-                onMessageTap: _handleMessageTap,
-                onSendPressed: _sendMessage,
-                // isAttachmentUploading: _isAttachmentUploading,
-                // onAttachmentPressed: _handleAtachmentPressed,
-                // onPreviewDataFetched: _handlePreviewDataFetched,
-                user: types.User(
-                  id: FirebaseChatCore.instance.firebaseUser?.uid ?? '',
-                ),
-                theme: DefaultChatTheme(
-                    inputBackgroundColor: greyColor,
-                    primaryColor: primaryColor,
-                    secondaryColor: greyColor.withOpacity(0.1),
-                    inputBorderRadius:
-                        BorderRadius.vertical(top: Radius.circular(10.r))),
-              ),
-            );
-          },
-        ),
-      );
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: _buildAppBar(),
+      body: StreamBuilder<types.Room>(
+        stream: FirebaseChatCore.instance.room(widget.room.id),
+        builder: (context, roomSnapshot) {
+          if (!roomSnapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          return _buildChatStream(roomSnapshot.data!);
+        },
+      ),
+    );
+  }
 }
