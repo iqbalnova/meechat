@@ -108,7 +108,10 @@ class _ChatState extends State<Chat> {
       initialData: const [],
       builder: (context, snapshot) {
         if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Text('No messages yet');
+          return Text(
+            'Lets chatting!',
+            style: TextStyle(color: primaryColor),
+          );
         }
 
         final firstMessage = snapshot.data!.first;
@@ -165,7 +168,10 @@ class _ChatState extends State<Chat> {
       initialData: const [],
       builder: (context, snapshot) {
         if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Text('');
+          return Icon(
+            Icons.chat,
+            color: primaryColor,
+          );
         }
 
         final firstMessage = snapshot.data!.first;
