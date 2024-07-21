@@ -49,9 +49,19 @@ class _FriendRequestsState extends State<FriendRequests> {
     }
   }
 
+  // Future<void> _rejectRequest(DocumentSnapshot request) async {
+  //   try {
+  //     await request.reference.update({'status': 'rejected'});
+  //   } catch (e) {
+  //     // Handle any errors here
+  //     throw ('Error rejecting friend request: $e');
+  //   }
+  // }
+
   Future<void> _rejectRequest(DocumentSnapshot request) async {
     try {
-      await request.reference.update({'status': 'rejected'});
+      // Delete the document from the 'friend_requests' collection
+      await request.reference.delete();
     } catch (e) {
       // Handle any errors here
       throw ('Error rejecting friend request: $e');
@@ -60,7 +70,7 @@ class _FriendRequestsState extends State<FriendRequests> {
 
   Widget _buildRequestListTile(DocumentSnapshot request) {
     return ListTile(
-      title: Text(request['receiverName']),
+      title: Text(request['senderName']),
       subtitle: const Text('Friend request'),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
