@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -66,8 +67,18 @@ class _ProfileState extends State<Profile> {
         children: [
           CircleAvatar(
             radius: 34.r,
-            backgroundImage: _userData?['imageUrl'] != null
-                ? NetworkImage(_userData?['imageUrl'])
+            backgroundColor: Colors.transparent,
+            child: _userData?['imageUrl'] != null
+                ? CachedNetworkImage(
+                    imageUrl: _userData!['imageUrl'],
+                    // placeholder: (context, url) => CircularProgressIndicator(),
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.error),
+                    imageBuilder: (context, imageProvider) => CircleAvatar(
+                      radius: 34.r,
+                      backgroundImage: imageProvider,
+                    ),
+                  )
                 : null,
           ),
           SizedBox(
