@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 
@@ -11,3 +12,12 @@ final customCacheManager = CacheManager(
     maxNrOfCacheObjects: 20,
   ),
 );
+
+void showSnackBar(BuildContext context, String message, Color color) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(message),
+      backgroundColor: color,
+    ),
+  );
+}

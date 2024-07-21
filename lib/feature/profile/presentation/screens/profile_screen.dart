@@ -7,6 +7,7 @@ import 'package:get_it/get_it.dart';
 import 'package:meechat/config/firebase_service.dart';
 import 'package:meechat/routes/app_routes.dart';
 import 'package:meechat/utils/styles.dart';
+import 'package:meechat/utils/util.dart';
 
 class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
@@ -71,6 +72,7 @@ class _ProfileState extends State<Profile> {
             child: _userData?['imageUrl'] != null
                 ? CachedNetworkImage(
                     imageUrl: _userData!['imageUrl'],
+                    cacheManager: customCacheManager,
                     // placeholder: (context, url) => CircularProgressIndicator(),
                     errorWidget: (context, url, error) =>
                         const Icon(Icons.error),
