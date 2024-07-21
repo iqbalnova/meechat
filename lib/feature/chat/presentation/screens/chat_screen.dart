@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -216,14 +217,23 @@ class _ChatState extends State<Chat> {
       margin: const EdgeInsets.only(right: 16),
       child: CircleAvatar(
         backgroundColor: hasImage ? Colors.transparent : color,
-        backgroundImage: hasImage ? NetworkImage(room.imageUrl!) : null,
         radius: 20,
-        child: !hasImage
-            ? Text(
+        child: hasImage
+            ? CachedNetworkImage(
+                imageUrl: room.imageUrl!,
+                cacheManager: customCacheManager,
+                // placeholder: (context, url) =>
+                //     const CircularProgressIndicator(),
+                errorWidget: (context, url, error) => const Icon(Icons.error),
+                imageBuilder: (context, imageProvider) => CircleAvatar(
+                  backgroundImage: imageProvider,
+                  radius: 20,
+                ),
+              )
+            : Text(
                 name.isEmpty ? '' : name[0].toUpperCase(),
                 style: const TextStyle(color: Colors.white),
-              )
-            : null,
+              ),
       ),
     );
   }
