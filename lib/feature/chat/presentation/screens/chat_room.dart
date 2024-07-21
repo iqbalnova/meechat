@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -64,6 +65,8 @@ class _ChatRoomState extends State<ChatRoom> {
   }
 
   void _sendMessage(types.PartialText message) {
+    if (message.text.isEmpty) return; // Check if message text is empty
+
     FirebaseChatCore.instance.sendMessage(message, widget.room.id);
     FirebaseService().sendNotification(
       title: widget.senderName,
@@ -192,8 +195,18 @@ class _ChatRoomState extends State<ChatRoom> {
         children: [
           CircleAvatar(
             backgroundColor: Colors.transparent,
-            backgroundImage: NetworkImage(widget.room.imageUrl!),
             radius: 20,
+            child: widget.room.imageUrl != null
+                ? CachedNetworkImage(
+                    imageUrl: widget.room.imageUrl!,
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.error),
+                    imageBuilder: (context, imageProvider) => CircleAvatar(
+                      backgroundImage: imageProvider,
+                      radius: 20,
+                    ),
+                  )
+                : const Icon(Icons.person), // Handle null case
           ),
           const SizedBox(width: 14),
           Text(
@@ -219,8 +232,7 @@ class _ChatRoomState extends State<ChatRoom> {
           messages: messages,
           onMessageTap: _handleMessageTap,
           onSendPressed: _sendMessage,
-          onMessageLongPress:
-              _handleMessageLongPress, // Use the method directly
+          onMessageLongPress: _handleMessageLongPress,
           user: types.User(
             id: FirebaseChatCore.instance.firebaseUser?.uid ?? '',
           ),
