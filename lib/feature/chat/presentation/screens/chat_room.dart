@@ -8,6 +8,7 @@ import 'package:flutter_firebase_chat_core/flutter_firebase_chat_core.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meechat/config/firebase_service.dart';
 import 'package:meechat/utils/styles.dart';
+import 'package:meechat/utils/util.dart';
 
 class ChatRoom extends StatefulWidget {
   final types.Room room;
@@ -199,6 +200,7 @@ class _ChatRoomState extends State<ChatRoom> {
             child: widget.room.imageUrl != null
                 ? CachedNetworkImage(
                     imageUrl: widget.room.imageUrl!,
+                    cacheManager: customCacheManager,
                     errorWidget: (context, url, error) =>
                         const Icon(Icons.error),
                     imageBuilder: (context, imageProvider) => CircleAvatar(
