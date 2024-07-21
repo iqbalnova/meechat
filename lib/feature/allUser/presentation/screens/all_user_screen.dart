@@ -15,19 +15,87 @@ class AllUser extends StatefulWidget {
 
 class _AllUserState extends State<AllUser> {
   final String currentUserId = FirebaseAuth.instance.currentUser!.uid;
+  bool _isFetching = false;
 
-  void _handlePressed(
+  Future<void> _handlePressed(
       types.User otherUser, context, String receiverName) async {
-    final room = await FirebaseChatCore.instance.createRoom(otherUser);
+    if (_isFetching) return; // Prevent multiple fetches
 
-    Navigator.pushNamed(
-      context,
-      AppRoutes.chatRoom,
-      arguments: {
-        'room': room,
-        'receiverName': receiverName,
-        'receiverUID': '',
-        'senderName': ''
+    setState(() {
+      _isFetching = true;
+    });
+
+    try {
+      final room = await FirebaseChatCore.instance.createRoom(otherUser);
+
+      Navigator.pushNamed(
+        context,
+        AppRoutes.chatRoom,
+        arguments: {
+          'room': room,
+          'receiverName': receiverName,
+          'receiverUID': '',
+          'senderName': ''
+        },
+      );
+    } catch (e) {
+      // Handle any errors here
+      throw ('Error creating room: $e');
+    } finally {
+      setState(() {
+        _isFetching = false;
+      });
+    }
+  }
+
+  Widget _buildUserListTile(types.User user, int index) {
+    return ListTile(
+      leading: CircleAvatar(
+        backgroundColor: Colors.blueGrey,
+        radius: 25,
+        child:
+            Text('${index + 1}', style: const TextStyle(color: Colors.white)),
+      ),
+      title: Text(getUserName(user)),
+      subtitle: Text(user.lastName ?? ''),
+      onTap: () {
+        _handlePressed(user, context, getUserName(user));
+      },
+    );
+  }
+
+  Widget _buildUserList(List<types.User> users) {
+    return ListView.separated(
+      itemCount: users.length,
+      itemBuilder: (context, index) {
+        final user = users[index];
+        return _buildUserListTile(user, index);
+      },
+      separatorBuilder: (context, index) {
+        return const Divider();
+      },
+    );
+  }
+
+  Widget _buildBody() {
+    return StreamBuilder<List<types.User>>(
+      stream: FirebaseChatCore.instance.users(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Center(
+            child: Text('Error: ${snapshot.error}'),
+          );
+        }
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+
+        final users = snapshot.data ?? [];
+
+        return _buildUserList(users);
       },
     );
   }
@@ -42,60 +110,7 @@ class _AllUserState extends State<AllUser> {
         backgroundColor: primaryColor,
         centerTitle: false,
       ),
-      body: StreamBuilder<List<types.User>>(
-        stream: FirebaseChatCore.instance.users(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Center(
-              child: Text('Error: ${snapshot.error}'),
-            );
-          }
-
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-
-          // // Data dari Firestore
-          // final List<QueryDocumentSnapshot<Map<String, dynamic>>> users =
-          //     snapshot.data!.docs;
-
-          // // Filter data untuk menghilangkan pengguna dengan UID yang sama dengan current user
-          // final List<QueryDocumentSnapshot<Map<String, dynamic>>>
-          //     filteredUsers = users.where((user) {
-          //   final String chatUserId = user['uid'] ?? '';
-          //   return chatUserId != currentUserId;
-          // }).toList();
-
-          return ListView.separated(
-            itemCount: snapshot.data!.length,
-            itemBuilder: (context, index) {
-              final user = snapshot.data![index];
-              // final userType =
-              //     types.User(id: user['uid'], firstName: user['name']);
-
-              // Gunakan data untuk membuat ListTile
-              return ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: Colors.blueGrey,
-                  radius: 25,
-                  child: Text('${index + 1}',
-                      style: const TextStyle(color: Colors.white)),
-                ),
-                title: Text(getUserName(user)),
-                subtitle: Text(user.lastName ?? ''),
-                onTap: () {
-                  _handlePressed(user, context, getUserName(user));
-                },
-              );
-            },
-            separatorBuilder: (context, index) {
-              return const Divider();
-            },
-          );
-        },
-      ),
+      body: _buildBody(),
     );
   }
 }
