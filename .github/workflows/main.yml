@@ -48,6 +48,6 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           artifacts: |
-            build/app/outputs/flutter-apk/app-meechat.apk
+            build/app/outputs/flutter-apk/app-release.apk
           tag: ${{ env.VERSION }}
           token: ${{ secrets.TOKEN }}
