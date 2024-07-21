@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_firebase_chat_core/flutter_firebase_chat_core.dart';
-import 'package:meechat/routes/app_routes.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
+import 'package:flutter_firebase_chat_core/flutter_firebase_chat_core.dart';
 import 'package:meechat/utils/styles.dart';
 import 'package:meechat/utils/util.dart';
 
@@ -17,7 +17,7 @@ class _AllUserState extends State<AllUser> {
   final String currentUserId = FirebaseAuth.instance.currentUser!.uid;
   bool _isFetching = false;
 
-  Future<void> _handlePressed(
+  Future<void> _sendFriendRequest(
       types.User otherUser, context, String receiverName) async {
     if (_isFetching) return; // Prevent multiple fetches
 
@@ -26,21 +26,34 @@ class _AllUserState extends State<AllUser> {
     });
 
     try {
-      final room = await FirebaseChatCore.instance.createRoom(otherUser);
+      await FirebaseFirestore.instance.collection('friend_requests').add({
+        'senderId': currentUserId,
+        'receiverId': otherUser.id,
+        'receiverName': receiverName,
+        'status':
+            'pending', // Possible values: 'pending', 'accepted', 'rejected'
+        'timestamp': FieldValue.serverTimestamp(),
+      });
 
-      Navigator.pushNamed(
-        context,
-        AppRoutes.chatRoom,
-        arguments: {
-          'room': room,
-          'receiverName': receiverName,
-          'receiverUID': '',
-          'senderName': ''
-        },
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Friend request sent to $receiverName',
+          ),
+          backgroundColor: Colors.green,
+        ),
       );
     } catch (e) {
       // Handle any errors here
-      throw ('Error creating room: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Error sending friend request to $receiverName',
+          ),
+          backgroundColor: redColor,
+        ),
+      );
+      throw ('Error sending friend request: $e');
     } finally {
       setState(() {
         _isFetching = false;
@@ -59,7 +72,7 @@ class _AllUserState extends State<AllUser> {
       title: Text(getUserName(user)),
       subtitle: Text(user.lastName ?? ''),
       onTap: () {
-        _handlePressed(user, context, getUserName(user));
+        _sendFriendRequest(user, context, getUserName(user));
       },
     );
   }

@@ -7,17 +7,31 @@ import 'package:meechat/utils/styles.dart';
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
+  static void navigateToPage(BuildContext context, int index) {
+    final mainScreenState = context.findAncestorStateOfType<_MainScreenState>();
+    if (mainScreenState != null && mainScreenState._isValidIndex(index)) {
+      mainScreenState._setIndex(index);
+    }
+  }
+
   @override
   State<MainScreen> createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 1;
+  final int _totalPages = 3; // Total number of pages in BottomNavigationBar
 
   void _setIndex(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
+    if (_isValidIndex(index)) {
+      setState(() {
+        _currentIndex = index;
+      });
+    }
+  }
+
+  bool _isValidIndex(int index) {
+    return index >= 0 && index < _totalPages;
   }
 
   Widget _buildBody() {
@@ -28,7 +42,6 @@ class _MainScreenState extends State<MainScreen> {
         return const Chat();
       case 2:
         return const Profile();
-
       default:
         return const OnDevScreen();
     }
@@ -39,7 +52,6 @@ class _MainScreenState extends State<MainScreen> {
       type: BottomNavigationBarType.fixed,
       selectedItemColor: primaryColor,
       unselectedItemColor: greyColor,
-      // showUnselectedLabels: false,
       currentIndex: _currentIndex,
       onTap: _setIndex,
       items: _bottomNavigationBarItems(),
@@ -48,10 +60,6 @@ class _MainScreenState extends State<MainScreen> {
 
   List<BottomNavigationBarItem> _bottomNavigationBarItems() {
     return const [
-      // BottomNavigationBarItem(
-      //   icon: Icon(Icons.home_outlined),
-      //   label: 'Home',
-      // ),
       BottomNavigationBarItem(
         icon: Icon(Icons.person_add),
         label: 'All User',

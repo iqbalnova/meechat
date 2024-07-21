@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:meechat/feature/auth/presentation/screens/login_screen.dart';
 import 'package:meechat/feature/auth/presentation/screens/register_screen.dart';
 import 'package:meechat/feature/chat/presentation/screens/chat_room.dart';
+import 'package:meechat/feature/chat/presentation/screens/friend_request.dart';
 import 'package:meechat/feature/core/presentation/screens/main_screen.dart';
 import 'package:meechat/feature/core/presentation/screens/splash_screen.dart';
 import 'package:meechat/routes/app_routes.dart';
@@ -29,6 +30,8 @@ class AppRouter {
                 receiverUID: args['receiverUID'],
                 senderName: args['senderName'],
               );
+            case AppRoutes.friendRequest:
+              return const FriendRequests();
             default:
               return const Scaffold(
                 body: Center(

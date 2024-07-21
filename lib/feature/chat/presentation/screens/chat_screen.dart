@@ -1,9 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_firebase_chat_core/flutter_firebase_chat_core.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
+import 'package:meechat/feature/auth/presentation/widgets/button_widget.dart';
+import 'package:meechat/feature/core/presentation/screens/main_screen.dart';
 import 'package:meechat/routes/app_routes.dart';
 import 'package:flutter_chat_types/flutter_chat_types.dart' as types;
 import 'package:meechat/utils/styles.dart';
@@ -49,6 +53,9 @@ class _ChatState extends State<Chat> {
           'Chat',
           style: whiteTextStyle.merge(titleTextStyle),
         ),
+        actions: [
+          FriendRequestWidget(currentUserId: currentUserId),
+        ],
         backgroundColor: primaryColor,
       ),
       body: StreamBuilder<List<types.Room>>(
@@ -56,10 +63,26 @@ class _ChatState extends State<Chat> {
         initialData: const [],
         builder: (context, snapshot) {
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(
-              child: Padding(
-                padding: EdgeInsets.only(bottom: 200),
-                child: Text('Add New Friends to Chat!'),
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Add New Friends to Chat!',
+                    style: TextStyle(fontSize: 16, color: greyColor),
+                  ),
+                  SizedBox(
+                    height: 14.h,
+                  ),
+                  SizedBox(
+                    width: 160,
+                    child: CustomButton(
+                        onTap: () {
+                          MainScreen.navigateToPage(context, 0);
+                        },
+                        label: 'Add Friends'),
+                  )
+                ],
               ),
             );
           }
@@ -235,6 +258,87 @@ class _ChatState extends State<Chat> {
                 style: const TextStyle(color: Colors.white),
               ),
       ),
+    );
+  }
+}
+
+class FriendRequestWidget extends StatelessWidget {
+  const FriendRequestWidget({
+    super.key,
+    required this.currentUserId,
+  });
+
+  final String currentUserId;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('friend_requests')
+          .where('receiverId', isEqualTo: currentUserId)
+          .where('status', isEqualTo: 'pending')
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Center(
+            child: Text('Error: ${snapshot.error}'),
+          );
+        }
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+
+        final int length = snapshot.data?.docs.length ?? 0;
+
+        return InkWell(
+          onTap: () {
+            Navigator.pushNamed(context, AppRoutes.friendRequest);
+          },
+          child: Container(
+            margin: const EdgeInsets.only(right: 16),
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                const Icon(
+                  Icons.person_search,
+                  size: 28,
+                  color: Colors.white,
+                ),
+                if (length > 0)
+                  Positioned(
+                    right: -6,
+                    top: -6,
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 24,
+                        minHeight: 24,
+                      ),
+                      child: Center(
+                        child: Text(
+                          '$length',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
