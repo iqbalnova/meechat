@@ -5,4 +5,5 @@ class AppRoutes {
   static const String main = '/main';
   static const String chatRoom = "/chatRoom";
   static const String friendRequest = "/friendRequest";
+  static const String qrInvitaion = "/qrInvitaion";
 }

@@ -5,6 +5,7 @@ import 'package:meechat/feature/chat/presentation/screens/chat_room.dart';
 import 'package:meechat/feature/chat/presentation/screens/friend_request.dart';
 import 'package:meechat/feature/core/presentation/screens/main_screen.dart';
 import 'package:meechat/feature/core/presentation/screens/splash_screen.dart';
+import 'package:meechat/feature/profile/presentation/screens/qr_invitation_screen.dart';
 import 'package:meechat/routes/app_routes.dart';
 
 class AppRouter {
@@ -32,6 +33,15 @@ class AppRouter {
               );
             case AppRoutes.friendRequest:
               return const FriendRequests();
+            case AppRoutes.qrInvitaion:
+              final Map<String, dynamic> args =
+                  settings.arguments as Map<String, dynamic>;
+              return QrInvitationScreen(
+                firstName: args['firstName'],
+                lastName: args['lastName'],
+                imgUrl: args['imgUrl'],
+                id: args['id'],
+              );
             default:
               return const Scaffold(
                 body: Center(

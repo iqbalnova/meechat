@@ -61,45 +61,53 @@ class _ProfileState extends State<Profile> {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          color: const Color(0XFFB5E2E2).withOpacity(0.4),
-          border: Border.all(color: const Color(0XFFB5E2E2))),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 34.r,
-            backgroundColor: Colors.transparent,
-            child: _userData?['imageUrl'] != null
-                ? CachedNetworkImage(
-                    imageUrl: _userData!['imageUrl'],
-                    cacheManager: customCacheManager,
-                    // placeholder: (context, url) => CircularProgressIndicator(),
-                    errorWidget: (context, url, error) =>
-                        const Icon(Icons.error),
-                    imageBuilder: (context, imageProvider) => CircleAvatar(
-                      radius: 34.r,
-                      backgroundImage: imageProvider,
-                    ),
-                  )
-                : null,
+        borderRadius: BorderRadius.circular(8),
+        color: const Color(0XFFB5E2E2).withOpacity(0.4),
+        border: Border.all(color: const Color(0XFFB5E2E2)),
+      ),
+      child: ListTile(
+        contentPadding: EdgeInsets.zero,
+        leading: CircleAvatar(
+          radius: 34.r,
+          backgroundColor: Colors.transparent,
+          child: _userData?['imageUrl'] != null
+              ? CachedNetworkImage(
+                  imageUrl: _userData!['imageUrl'],
+                  cacheManager: customCacheManager,
+                  errorWidget: (context, url, error) => const Icon(Icons.error),
+                  imageBuilder: (context, imageProvider) => CircleAvatar(
+                    radius: 34.r,
+                    backgroundImage: imageProvider,
+                  ),
+                )
+              : null,
+        ),
+        title: Text(
+          formatFullName(
+            _userData?['firstName'],
+            _userData?['lastName'],
           ),
-          SizedBox(
-            width: 16.w,
+          style: blackTextStyle.merge(semiBoldStyle),
+        ),
+        subtitle: Text(_userData?['email'] ?? ''),
+        trailing: Container(
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: greyColor.withOpacity(0.1),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                formatFullName(
-                  _userData?['firstName'],
-                  _userData?['lastName'],
-                ),
-                style: blackTextStyle.merge(semiBoldStyle),
-              ),
-              Text(_userData?['email'] ?? ''),
-            ],
-          )
-        ],
+          child: IconButton(
+            color: whiteColor,
+            onPressed: () {
+              Navigator.pushNamed(context, AppRoutes.qrInvitaion, arguments: {
+                'id': _userData!['uid'],
+                'imgUrl': _userData!['imageUrl'],
+                'firstName': _userData?['firstName'],
+                'lastName': _userData?['lastName'],
+              });
+            },
+            icon: const Icon(Icons.qr_code),
+          ),
+        ),
       ),
     );
   }
