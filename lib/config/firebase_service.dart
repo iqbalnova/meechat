@@ -13,6 +13,7 @@ class FirebaseService {
   // Singleton pattern
   static final FirebaseService _instance = FirebaseService._internal();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseMessaging _messaging = FirebaseMessaging.instance;
 
   factory FirebaseService() => _instance;
 
@@ -106,40 +107,46 @@ class FirebaseService {
     });
   }
 
+  void requestPermission() async {
+    await _messaging.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+  }
+
   Future<void> setupFCM() async {
-    String? token = await FirebaseMessaging.instance.getToken();
+    String? token = await _messaging.getToken();
     await saveTokenToDatabase(token!);
-    FirebaseMessaging.instance.onTokenRefresh.listen(saveTokenToDatabase);
+    _messaging.onTokenRefresh.listen(saveTokenToDatabase);
 
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      if (kDebugMode) {
-        print("Foreground Message: ${message.data}");
-      }
-    });
-
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      if (kDebugMode) {
-        print("Background Message: ${message.data}");
-      }
-    });
+    // FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    //   if (kDebugMode) {
+    //     print("Background Message: ${message.data}");
+    //   }
+    // });
   }
 
   Future<void> sendNotification({
     required String title,
     required String body,
     required String token,
+    required String notifType,
+    String? argument,
   }) async {
     const String serverKey =
         'AAAASIChfXQ:APA91bFf1-x-Pqp-GdEDEt1QVIK5Q_64gpl2NLRSoiqK60hIzwk8xSZu_uCbLGTq-MvTKMJQi5clwKPFX-TZf9KQmcoNfP02r9lj8ECqLEj8I81jmkvQF9Jvp_89z4QoNQJF788OnE5H';
     const String fcmEndpoint = 'https://fcm.googleapis.com/fcm/send';
 
-    final Map<String, dynamic> notification = {
+    final Map<String, dynamic> data = {
       'title': title,
       'body': body,
+      'notificationType': notifType,
+      'argument': argument,
     };
 
-    final Map<String, dynamic> data = {
-      'notification': notification,
+    final Map<String, dynamic> dataPayload = {
+      'data': data,
       'to': token,
     };
 
@@ -153,7 +160,7 @@ class FirebaseService {
             'Authorization': 'key=$serverKey',
           },
         ),
-        data: jsonEncode(data),
+        data: jsonEncode(dataPayload),
       );
 
       if (kDebugMode) {

@@ -10,50 +10,52 @@ import 'package:meechat/routes/app_routes.dart';
 
 class AppRouter {
   Route? onGenerateRoute(RouteSettings settings) {
-    return MaterialPageRoute(builder: (context) {
-      return Builder(
+    return MaterialPageRoute(
+        settings: settings,
         builder: (BuildContext context) {
-          switch (settings.name) {
-            case AppRoutes.splash:
-              return const SplashScreen();
-            case AppRoutes.main:
-              return const MainScreen();
-            case AppRoutes.login:
-              return const LoginScreen();
-            case AppRoutes.register:
-              return const RegisterScreen();
-            case AppRoutes.chatRoom:
-              final Map<String, dynamic> args =
-                  settings.arguments as Map<String, dynamic>;
-              return ChatRoom(
-                receiverName: args['receiverName'],
-                room: args['room'],
-                receiverUID: args['receiverUID'],
-                senderName: args['senderName'],
-              );
-            case AppRoutes.friendRequest:
-              return const FriendRequests();
-            case AppRoutes.qrInvitaion:
-              final Map<String, dynamic> args =
-                  settings.arguments as Map<String, dynamic>;
-              return QrInvitationScreen(
-                firstName: args['firstName'],
-                lastName: args['lastName'],
-                imgUrl: args['imgUrl'],
-                id: args['id'],
-              );
-            default:
-              return const Scaffold(
-                body: Center(
-                  child: Text(
-                    'Check Named Routes',
-                    style: TextStyle(fontSize: 30, color: Colors.black),
-                  ),
-                ),
-              );
-          }
-        },
-      );
-    });
+          return Builder(
+            builder: (BuildContext context) {
+              switch (settings.name) {
+                case AppRoutes.splash:
+                  return const SplashScreen();
+                case AppRoutes.main:
+                  return const MainScreen();
+                case AppRoutes.login:
+                  return const LoginScreen();
+                case AppRoutes.register:
+                  return const RegisterScreen();
+                case AppRoutes.chatRoom:
+                  final Map<String, dynamic> args =
+                      settings.arguments as Map<String, dynamic>;
+                  return ChatRoom(
+                    receiverName: args['receiverName'],
+                    room: args['room'],
+                    receiverUID: args['receiverUID'],
+                    senderName: args['senderName'],
+                  );
+                case AppRoutes.friendRequest:
+                  return const FriendRequests();
+                case AppRoutes.qrInvitaion:
+                  final Map<String, dynamic> args =
+                      settings.arguments as Map<String, dynamic>;
+                  return QrInvitationScreen(
+                    firstName: args['firstName'],
+                    lastName: args['lastName'],
+                    imgUrl: args['imgUrl'],
+                    id: args['id'],
+                  );
+                default:
+                  return const Scaffold(
+                    body: Center(
+                      child: Text(
+                        'Check Named Routes',
+                        style: TextStyle(fontSize: 30, color: Colors.black),
+                      ),
+                    ),
+                  );
+              }
+            },
+          );
+        });
   }
 }

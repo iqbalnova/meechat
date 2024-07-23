@@ -1,17 +1,26 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:meechat/app.dart';
+import 'package:meechat/config/firebase_service.dart';
 import 'package:meechat/config/locator.dart';
+import 'package:meechat/config/notification_controller.dart';
 import 'package:meechat/firebase_options.dart';
 
 final GlobalKey<NavigatorState> globalKey = GlobalKey<NavigatorState>();
 
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  if (kDebugMode) {
-    print("Handling a background message: ${message.toMap()}");
+  final Map<String, dynamic> data = message.data;
+  if (data.isNotEmpty) {
+    NotificationController().createNotification(
+      title: data['title'],
+      body: data['body'],
+      payload: {
+        'notificationtype': data['notificationType'],
+        'argument': data['argument'] ?? '',
+      },
+    );
   }
 }
 
@@ -21,15 +30,8 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   Locator().setupDepedencyInjection();
-
-  FirebaseMessaging messaging = FirebaseMessaging.instance;
-
-  await messaging.requestPermission(
-    alert: true,
-    badge: true,
-    sound: true,
-  );
-
+  FirebaseService().requestPermission();
+  NotificationController().initializeLocalChannel();
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
   runApp(MyApp(

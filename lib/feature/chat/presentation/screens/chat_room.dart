@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
@@ -70,10 +72,16 @@ class _ChatRoomState extends State<ChatRoom> {
 
     FirebaseChatCore.instance.sendMessage(message, widget.room.id);
     FirebaseService().sendNotification(
-      title: widget.senderName,
-      token: receiverToken,
-      body: message.text,
-    );
+        title: widget.senderName,
+        token: receiverToken,
+        body: message.text,
+        notifType: 'message',
+        argument: jsonEncode(
+          {
+            'room': widget.room,
+            'receiverName': widget.senderName,
+          },
+        ));
   }
 
   void _handleMessageLongPress(BuildContext context, types.Message message) {
