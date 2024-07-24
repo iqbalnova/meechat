@@ -18,17 +18,27 @@ class AllUser extends StatefulWidget {
 
 class _AllUserState extends State<AllUser> {
   final String currentUserId = FirebaseAuth.instance.currentUser!.uid;
+  final Set<String> _requestedUsers = {};
 
   Future<void> _sendFriendRequest(
     types.User otherUser,
     context,
     String receiverName,
   ) async {
+    final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+    if (currentUserId == null) {
+      showSnackBar(context, 'Current user is not authenticated', Colors.red);
+      return;
+    }
+
+    if (_requestedUsers.contains(otherUser.id)) {
+      showSnackBar(context, 'Friend request already sent to $receiverName',
+          Colors.orange);
+      return;
+    }
+
     try {
-      final currentUserId = FirebaseAuth.instance.currentUser?.uid;
-      if (currentUserId == null) {
-        throw 'Current user is not authenticated';
-      }
+      _requestedUsers.add(otherUser.id);
 
       final requestStatus =
           await _checkExistingRequest(currentUserId, otherUser.id);
@@ -36,6 +46,7 @@ class _AllUserState extends State<AllUser> {
       if (requestStatus != null) {
         await _handleExistingRequest(
             requestStatus, otherUser, receiverName, context);
+        _requestedUsers.remove(otherUser.id);
         return;
       }
 
@@ -45,6 +56,7 @@ class _AllUserState extends State<AllUser> {
       if (reverseRequestStatus != null) {
         await _handleExistingRequest(
             reverseRequestStatus, otherUser, receiverName, context);
+        _requestedUsers.remove(otherUser.id);
         return;
       }
 
@@ -54,6 +66,8 @@ class _AllUserState extends State<AllUser> {
     } catch (e) {
       showSnackBar(
           context, 'Error sending friend request to $receiverName', Colors.red);
+    } finally {
+      _requestedUsers.remove(otherUser.id);
     }
   }
 
@@ -101,11 +115,8 @@ class _AllUserState extends State<AllUser> {
     String receiverId,
     String receiverName,
   ) async {
-    // Get the current user's details
     final userDetails = await _getUserDetails(senderId);
     final senderName = '${userDetails['firstName']} ${userDetails['lastName']}';
-
-    // // Get the receiver's token
     final receiverDetails = await _getUserDetails(receiverId);
     final receiverToken = receiverDetails['token'];
 
@@ -118,11 +129,11 @@ class _AllUserState extends State<AllUser> {
       'timestamp': FieldValue.serverTimestamp(),
     });
 
-    // Send notification
     FirebaseService().sendNotification(
       title: 'New Friend Request',
       token: receiverToken!,
       body: '$senderName wants to be your friend. Tap to view and respond.',
+      notifType: 'inviteUser',
     );
   }
 
@@ -139,7 +150,7 @@ class _AllUserState extends State<AllUser> {
 
       final data = docSnapshot.data() as Map<String, dynamic>;
 
-      final tokens = (data['tokens']);
+      final tokens = data['tokens'];
       final firstName = data['firstName'];
       final lastName = data['lastName'];
 
@@ -149,15 +160,13 @@ class _AllUserState extends State<AllUser> {
         'lastName': lastName,
       };
     } catch (e) {
-      // Handle any errors that might occur during data retrieval
       if (kDebugMode) {
         print('Error retrieving user details: $e');
       }
-      return _defaultUserDetails(); // Return default values in case of an error
+      return _defaultUserDetails();
     }
   }
 
-  /// Returns default values for user details.
   Map<String, String> _defaultUserDetails() {
     return {
       'token': '',
@@ -167,6 +176,8 @@ class _AllUserState extends State<AllUser> {
   }
 
   Widget _buildUserListTile(types.User user, int index) {
+    final isRequested = _requestedUsers.contains(user.id);
+
     return ListTile(
       leading: CircleAvatar(
         backgroundColor: Colors.blueGrey,
@@ -176,9 +187,11 @@ class _AllUserState extends State<AllUser> {
       ),
       title: Text(getUserName(user)),
       subtitle: Text(user.lastName ?? ''),
-      onTap: () {
-        _sendFriendRequest(user, context, getUserName(user));
-      },
+      onTap: isRequested
+          ? null
+          : () {
+              _sendFriendRequest(user, context, getUserName(user));
+            },
     );
   }
 
