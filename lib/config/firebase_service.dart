@@ -132,7 +132,8 @@ class FirebaseService {
     required String body,
     required String token,
     required String notifType,
-    String? argument,
+    String? room,
+    String? receiverName,
   }) async {
     const String serverKey =
         'AAAASIChfXQ:APA91bFf1-x-Pqp-GdEDEt1QVIK5Q_64gpl2NLRSoiqK60hIzwk8xSZu_uCbLGTq-MvTKMJQi5clwKPFX-TZf9KQmcoNfP02r9lj8ECqLEj8I81jmkvQF9Jvp_89z4QoNQJF788OnE5H';
@@ -142,7 +143,8 @@ class FirebaseService {
       'title': title,
       'body': body,
       'notificationType': notifType,
-      'argument': argument,
+      'room': room,
+      'receiverName': receiverName,
     };
 
     final Map<String, dynamic> dataPayload = {

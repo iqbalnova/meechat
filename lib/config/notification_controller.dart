@@ -30,24 +30,13 @@ class NotificationController {
     // Your code goes here
   }
 
-  /// Use this method to detect when the user taps on a notification or action button
   @pragma("vm:entry-point")
   static Future<void> onActionReceivedMethod(
       ReceivedAction receivedAction) async {
     final Map<String, dynamic>? payload = receivedAction.payload;
 
-    // Check payload if not null and get notificationtype value
-    final String? notifType = payload?['notificationtype'] as String?;
-    final String? argument = payload?['argument'] as String?;
-    final Map<String, dynamic> jsonMap = jsonDecode(argument!);
-    final type.Room room = jsonMap['room'];
-
-    print('===========');
-
-    print(argument);
-    print(jsonMap);
-
-    print('===========');
+    // Check if payload is not null and get notificationtype and argument values
+    final String? notifType = payload?['notificationType'] as String?;
 
     if (globalKey.currentState != null) {
       switch (notifType) {
@@ -55,9 +44,17 @@ class NotificationController {
           globalKey.currentState?.pushNamed(AppRoutes.friendRequest);
           break;
         case 'message':
+          final String room = payload?['room'] as String;
+          final String receiverName = payload?['receiverName'] as String;
+
           globalKey.currentState?.pushNamed(AppRoutes.chatRoom, arguments: {
-            'room': room,
-            'receiverName': jsonMap['receiverName'],
+            'room': type.Room(
+              id: jsonDecode(room)['id'],
+              type: null,
+              users: const [],
+              imageUrl: jsonDecode(room)['users'][1]['imageUrl'],
+            ),
+            'receiverName': receiverName,
             'receiverUID': '',
             'senderName': '',
           });
@@ -77,7 +74,8 @@ class NotificationController {
   void initializeLocalChannel() {
     AwesomeNotifications().initialize(
       // set the icon to null if you want to use the default app icon
-      null,
+      // null,
+      'resource://drawable/notif_icon',
       [
         NotificationChannel(
             channelGroupKey: 'basic_channel_group',

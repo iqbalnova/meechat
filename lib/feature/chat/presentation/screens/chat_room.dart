@@ -72,16 +72,19 @@ class _ChatRoomState extends State<ChatRoom> {
 
     FirebaseChatCore.instance.sendMessage(message, widget.room.id);
     FirebaseService().sendNotification(
-        title: widget.senderName,
-        token: receiverToken,
-        body: message.text,
-        notifType: 'message',
-        argument: jsonEncode(
-          {
-            'room': widget.room,
-            'receiverName': widget.senderName,
-          },
-        ));
+      title: widget.senderName,
+      token: receiverToken,
+      body: message.text,
+      notifType: 'message',
+      room: jsonEncode(widget.room),
+      receiverName: widget.senderName,
+    );
+    // argument: jsonEncode(
+    //   {
+    //     'room': widget.room,
+    //     'receiverName': widget.senderName,
+    //   },
+    // ));
   }
 
   void _handleMessageLongPress(BuildContext context, types.Message message) {

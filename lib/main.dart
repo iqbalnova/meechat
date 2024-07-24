@@ -17,8 +17,9 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
       title: data['title'],
       body: data['body'],
       payload: {
-        'notificationtype': data['notificationType'],
-        'argument': data['argument'] ?? '',
+        'notificationType': data['notificationType'],
+        'room': data['room'] ?? '',
+        'receiverName': data['receiverName'] ?? '',
       },
     );
   }
