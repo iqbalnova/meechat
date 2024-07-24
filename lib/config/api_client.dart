@@ -33,7 +33,6 @@ class ApiClient {
           return handler.next(error);
         }
 
-        // TODO: Handle Refresh Token
         // RequestOptions origin = error.requestOptions;
 
         // try {
