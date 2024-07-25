@@ -46,18 +46,34 @@ class NotificationController {
         case 'message':
           final String room = payload?['room'] as String;
           final String receiverName = payload?['receiverName'] as String;
-
           globalKey.currentState?.pushNamed(AppRoutes.chatRoom, arguments: {
             'room': type.Room(
               id: jsonDecode(room)['id'],
-              type: null,
-              users: const [],
-              imageUrl: jsonDecode(room)['users'][1]['imageUrl'],
+              type: type.RoomType
+                  .direct, // Sesuaikan dengan nilai yang sesuai, misalnya 'direct'
+              users: (jsonDecode(room)['users'] as List)
+                  .map((user) => type.User(
+                        createdAt: user['createdAt'],
+                        firstName: user['firstName'],
+                        id: user['id'],
+                        imageUrl: user['imageUrl'],
+                        lastName: user['lastName'],
+                        lastSeen: user['lastSeen'],
+                        updatedAt: user['updatedAt'],
+                      ))
+                  .toList(),
+              imageUrl: jsonDecode(room)['users'][0]['imageUrl'],
+              createdAt: jsonDecode(room)['createdAt'],
+              // lastMessages: [], // Sesuaikan dengan data yang sesuai jika ada
+              // metadata: jsonDecode(room)['metadata'], // Jika ada metadata
+              name: jsonDecode(room)['name'],
+              updatedAt: jsonDecode(room)['updatedAt'],
             ),
             'receiverName': receiverName,
-            'receiverUID': '',
+            'receiverUID': jsonDecode(room)['users'][0]['id'],
             'senderName': '',
           });
+
           break;
         default:
           globalKey.currentState?.pushNamed(AppRoutes.main);

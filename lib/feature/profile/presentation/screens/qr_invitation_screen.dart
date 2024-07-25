@@ -82,7 +82,7 @@ class _QrInvitationScreenState extends State<QrInvitationScreen> {
     );
   }
 
-  void createRoom({required String data}) async {
+  void createRoom({required String data, context}) async {
     try {
       final Map<String, dynamic> jsonMap = jsonDecode(data);
 
