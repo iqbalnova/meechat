@@ -17,7 +17,7 @@ class FriendRequests extends StatefulWidget {
 class _FriendRequestsState extends State<FriendRequests> {
   final String currentUserId = FirebaseAuth.instance.currentUser!.uid;
 
-  Future<void> _acceptRequest(DocumentSnapshot request) async {
+  Future<void> _acceptRequest(DocumentSnapshot request, context) async {
     try {
       final otherUserId = request['senderId'];
       final otherUserSnapshot = await FirebaseFirestore.instance
@@ -77,7 +77,7 @@ class _FriendRequestsState extends State<FriendRequests> {
         children: [
           IconButton(
             icon: const Icon(Icons.check, color: Colors.green),
-            onPressed: () => _acceptRequest(request),
+            onPressed: () => _acceptRequest(request, context),
           ),
           IconButton(
             icon: const Icon(Icons.close, color: Colors.red),

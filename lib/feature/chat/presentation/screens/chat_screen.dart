@@ -62,6 +62,18 @@ class _ChatState extends State<Chat> {
         stream: FirebaseChatCore.instance.rooms(),
         initialData: const [],
         builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(
+              child: Text('Error: ${snapshot.error}'),
+            );
+          }
+
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: SizedBox(),
+            );
+          }
+
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(
               child: Column(
@@ -287,7 +299,7 @@ class FriendRequestWidget extends StatelessWidget {
 
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
-            child: CircularProgressIndicator(),
+            child: SizedBox(),
           );
         }
 
