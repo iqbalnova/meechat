@@ -45,7 +45,7 @@ app.*.map.json
 # Android related
 android/.gradle/
 android/app/build/
-android/key.properties
+# android/key.properties
 
 # Firebase related
 ios/Runner/GoogleService-Info.plist
