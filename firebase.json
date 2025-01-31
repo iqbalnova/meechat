@@ -1,0 +1,22 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "meechat-4ff49",
+          "appId": "1:311395712372:android:ddf2ea279ba94fd7b24021",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "meechat-4ff49",
+          "configurations": {
+            "android": "1:311395712372:android:ddf2ea279ba94fd7b24021",
+            "ios": "1:311395712372:ios:27179793e10b84c5b24021"
+          }
+        }
+      }
+    }
+  }
+}
