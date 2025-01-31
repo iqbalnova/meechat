@@ -29,8 +29,15 @@ jobs:
         with:
           channel: "stable"
 
-      - name: Set up google-services.json
-        run: echo "${{ secrets.GOOGLE_SERVICES_JSON }}" > android/app/google-services.json
+      - name: Decode Google Services JSON
+        id: decode
+        uses: timheuer/base64-to-file@v1.2
+        with:
+          fileName: "google-services.json"
+          encodedString: ${{ secrets.GOOGLE_SERVICES_JSON }}
+
+      - name: Move google-services.json
+        run: mv ${{ steps.decode.outputs.filePath }} android/app/google-services.json
 
       - name: Install dependencies
         run: flutter pub get
