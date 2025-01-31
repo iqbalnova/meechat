@@ -10,6 +10,7 @@ class CustomTextFormField extends StatelessWidget {
   final VoidCallback? onTap;
   final int? maxLines;
   final TextInputType keyboardType;
+  final bool isRequired;
 
   const CustomTextFormField({
     super.key,
@@ -20,6 +21,7 @@ class CustomTextFormField extends StatelessWidget {
     required this.label,
     this.maxLines = 1,
     this.keyboardType = TextInputType.text,
+    this.isRequired = false,
   });
 
   @override
@@ -29,9 +31,20 @@ class CustomTextFormField extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style: blackTextStyle,
+          RichText(
+            text: TextSpan(
+              children: [
+                TextSpan(
+                  text: label,
+                  style: blackTextStyle, // Gaya teks utama
+                ),
+                if (isRequired) // Tambahkan bintang merah jika isRequired = true
+                  const TextSpan(
+                    text: ' *',
+                    style: TextStyle(color: Colors.red), // Warna merah untuk *
+                  ),
+              ],
+            ),
           ),
           Container(
               margin: EdgeInsets.only(top: 4.h),

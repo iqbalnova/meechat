@@ -5,7 +5,7 @@ import 'package:meechat/routes/app_routes.dart';
 import 'package:meechat/utils/styles.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({Key? key}) : super(key: key);
+  const RegisterScreen({super.key});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -21,6 +21,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       TextEditingController(text: '');
   bool isPasswordObsecure = true;
   bool isValidForm = false;
+  bool isLoading = false;
 
   final FirebaseService _firebaseService = FirebaseService();
 
@@ -53,6 +54,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   void _onRegister(context) async {
+    if (isLoading) return; // Prevent multiple login attempts
+
+    setState(() {
+      isLoading = true;
+    });
+
     try {
       await _firebaseService.registerWithEmailPassword(
           emailController.text,
@@ -68,6 +75,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
           backgroundColor: redColor,
         ),
       );
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -89,6 +102,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               passwordController: passwordController,
               isPasswordObsecure: isPasswordObsecure,
               isValidForm: isValidForm,
+              isLoadingRegister: isLoading,
               onPasswordSuffixTap: () {
                 setState(() {
                   isPasswordObsecure = !isPasswordObsecure;
@@ -98,7 +112,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 _onRegister(context);
               },
             ),
-            const LoginButton(),
           ],
         ),
       ),

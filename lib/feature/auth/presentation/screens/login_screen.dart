@@ -4,7 +4,7 @@ import 'package:meechat/feature/auth/presentation/widgets/login_widget.dart';
 import 'package:meechat/routes/app_routes.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -16,16 +16,22 @@ class _LoginScreenState extends State<LoginScreen> {
       TextEditingController(text: '');
   bool isPasswordObsecure = true;
   bool isValidForm = false;
+  bool isLoading = false;
 
   final FirebaseService _firebaseService = FirebaseService();
 
-  // handle empty field
   @override
   void initState() {
     super.initState();
-
     emailController.addListener(() => updateFormStatus());
     passwordController.addListener(() => updateFormStatus());
+  }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
   }
 
   void updateFormStatus() {
@@ -35,23 +41,38 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
-  // Handle eye
   void onPasswordSuffixTap() {
     setState(() {
       isPasswordObsecure = !isPasswordObsecure;
     });
   }
 
-  void _onLogin(context) async {
+  Future<void> _onLogin(context) async {
+    if (isLoading) return; // Prevent multiple login attempts
+
+    setState(() {
+      isLoading = true;
+    });
+
     try {
       await _firebaseService.signInWithEmailPassword(
-          emailController.text, passwordController.text);
+        emailController.text,
+        passwordController.text,
+      );
+
+      if (!mounted) return;
       Navigator.pushNamedAndRemoveUntil(
-          context, AppRoutes.main, (route) => false);
+        context,
+        AppRoutes.main,
+        (route) => false,
+      );
+
       await _firebaseService.setupFCM();
     } catch (e) {
+      if (!mounted) return;
       showDialog(
         context: context,
+        barrierDismissible: false, // Prevent dismissing during loading
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('Error'),
@@ -67,6 +88,12 @@ class _LoginScreenState extends State<LoginScreen> {
           );
         },
       );
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -82,9 +109,8 @@ class _LoginScreenState extends State<LoginScreen> {
               isPasswordObsecure: isPasswordObsecure,
               onPasswordSuffixTap: onPasswordSuffixTap,
               isValidForm: isValidForm,
-              onLogin: () {
-                _onLogin(context);
-              },
+              isLoadingLogin: isLoading,
+              onLogin: () => _onLogin(context),
             ),
             const RegisterButton(),
           ],

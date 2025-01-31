@@ -142,6 +142,16 @@ class _ChatState extends State<Chat> {
       stream: FirebaseChatCore.instance.messages(room),
       initialData: const [],
       builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Center(
+            child: Text('Error: ${snapshot.error}'),
+          );
+        }
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const SizedBox();
+        }
+
         if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return Text(
             'Lets chatting!',
@@ -202,6 +212,16 @@ class _ChatState extends State<Chat> {
       stream: FirebaseChatCore.instance.messages(room),
       initialData: const [],
       builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Center(
+            child: Text('Error: ${snapshot.error}'),
+          );
+        }
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const SizedBox();
+        }
+
         if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return Icon(
             Icons.chat,

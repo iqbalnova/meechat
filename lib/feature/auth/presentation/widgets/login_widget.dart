@@ -13,16 +13,18 @@ class LoginForm extends StatelessWidget {
   final VoidCallback onPasswordSuffixTap;
   final bool isValidForm;
   final VoidCallback onLogin;
+  final bool isLoadingLogin;
 
-  const LoginForm(
-      {Key? key,
-      required this.emailController,
-      required this.passwordController,
-      required this.isPasswordObsecure,
-      required this.onPasswordSuffixTap,
-      required this.isValidForm,
-      required this.onLogin})
-      : super(key: key);
+  const LoginForm({
+    super.key,
+    required this.emailController,
+    required this.passwordController,
+    required this.isPasswordObsecure,
+    required this.onPasswordSuffixTap,
+    required this.isValidForm,
+    required this.onLogin,
+    this.isLoadingLogin = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -61,6 +63,7 @@ class LoginForm extends StatelessWidget {
                   onTap: onLogin,
                   label: 'Masuk',
                   isDisable: !isValidForm,
+                  isLoading: isLoadingLogin,
                 ),
               ],
             ),

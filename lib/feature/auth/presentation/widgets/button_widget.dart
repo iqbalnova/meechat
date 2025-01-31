@@ -8,6 +8,7 @@ class CustomButton extends StatelessWidget {
   final Decoration? decoration;
   final TextStyle? textStyle;
   final bool isDisable;
+  final bool isLoading;
 
   const CustomButton({
     super.key,
@@ -16,6 +17,7 @@ class CustomButton extends StatelessWidget {
     this.decoration,
     this.textStyle,
     this.isDisable = false,
+    this.isLoading = false,
   });
 
   @override
@@ -28,13 +30,32 @@ class CustomButton extends StatelessWidget {
         decoration: decoration ??
             BoxDecoration(
               borderRadius: BorderRadius.circular(16),
-              color: isDisable ? primaryColor.withOpacity(0.6) : primaryColor,
+              color: isDisable ? primaryColor.withOpacity(0.4) : primaryColor,
             ),
         child: Center(
-            child: Text(
-          label,
-          style: textStyle ?? whiteTextStyle,
-        )),
+          child: isLoading
+              ? Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 3,
+                      ),
+                    ),
+                    const SizedBox(width: 20),
+                    Text(
+                      'Loading...',
+                      style: textStyle ?? whiteTextStyle,
+                    ),
+                  ],
+                )
+              : Text(
+                  label,
+                  style: textStyle ?? whiteTextStyle,
+                ),
+        ),
       ),
     );
   }

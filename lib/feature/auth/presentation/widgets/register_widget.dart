@@ -14,9 +14,10 @@ class RegisterForm extends StatelessWidget {
   final VoidCallback onPasswordSuffixTap;
   final bool isValidForm;
   final VoidCallback onRegister;
+  final bool isLoadingRegister;
 
   const RegisterForm({
-    Key? key,
+    super.key,
     required this.firstNameController,
     required this.emailController,
     required this.passwordController,
@@ -25,7 +26,8 @@ class RegisterForm extends StatelessWidget {
     required this.isValidForm,
     required this.onRegister,
     required this.lasttNameController,
-  }) : super(key: key);
+    this.isLoadingRegister = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -46,21 +48,25 @@ class RegisterForm extends StatelessWidget {
                   CustomTextFormField(
                     hintText: 'Input Nama Depan',
                     label: 'Nama Depan',
+                    isRequired: true,
                     controller: firstNameController,
                   ),
                   CustomTextFormField(
                     hintText: 'Input Nama Belakang',
                     label: 'Nama Belakang',
+                    isRequired: true,
                     controller: lasttNameController,
                   ),
                   CustomTextFormField(
                     hintText: 'Contoh: johndee@gmail.com',
                     label: 'Email',
+                    isRequired: true,
                     controller: emailController,
                   ),
                   CustomTextFormField(
                     hintText: 'Buat Password',
                     label: 'Buat Password',
+                    isRequired: true,
                     isObsecure: isPasswordObsecure,
                     controller: passwordController,
                     onTap: onPasswordSuffixTap,
@@ -71,7 +77,12 @@ class RegisterForm extends StatelessWidget {
                 onTap: onRegister,
                 label: 'Daftar',
                 isDisable: !isValidForm,
+                isLoading: isLoadingRegister,
               ),
+              SizedBox(
+                height: 20,
+              ),
+              const LoginButton()
             ],
           ),
         ]),
@@ -82,8 +93,8 @@ class RegisterForm extends StatelessWidget {
 
 class LoginButton extends StatelessWidget {
   const LoginButton({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {

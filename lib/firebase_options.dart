@@ -51,18 +51,19 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyBe2JQt42FU7Fc8Sx5mETWHHUlVj3BZWVg',
-    appId: '1:311395712372:android:162a746cf75f388db24021',
+    appId: '1:311395712372:android:ddf2ea279ba94fd7b24021',
     messagingSenderId: '311395712372',
     projectId: 'meechat-4ff49',
-    storageBucket: 'meechat-4ff49.appspot.com',
+    storageBucket: 'meechat-4ff49.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyD0vF5Wh70MPLFcEvh0rou3gygXqgwvMAM',
-    appId: '1:311395712372:ios:1f916e74de67ba08b24021',
+    appId: '1:311395712372:ios:27179793e10b84c5b24021',
     messagingSenderId: '311395712372',
     projectId: 'meechat-4ff49',
-    storageBucket: 'meechat-4ff49.appspot.com',
-    iosBundleId: 'com.example.meechat',
+    storageBucket: 'meechat-4ff49.firebasestorage.app',
+    iosBundleId: 'com.iqbalnova.meechat',
   );
+
 }
