@@ -39,6 +39,16 @@ jobs:
       - name: Move google-services.json
         run: mv ${{ steps.decode.outputs.filePath }} android/app/google-services.json
 
+      - name: Decode Keystore
+        id: decode_keystore
+        uses: timheuer/base64-to-file@v1.2
+        with:
+          fileName: "upload-keystore.jks"
+          encodedString: ${{ secrets.KEYSTORE }}
+
+      - name: Move Keystore to Android app directory
+        run: mv ${{ steps.decode_keystore.outputs.filePath }} android/app/upload-keystore.jks
+
       - name: Install dependencies
         run: flutter pub get
 
